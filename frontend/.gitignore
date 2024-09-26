@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 # misc
+.env
 .DS_Store
 .env.local
 .env.development.local
