@@ -9,7 +9,7 @@ const Chat = () => {
   const [questions, setQuestions] = useState([]);
   const [answer, setAnswer] = useState("");
   const [currentQuestionOrder, setCurrentQuestionOrder] = useState(() => {
-    // Get last question from sessionStorage 
+    // Get last question from sessionStorage
     const storedQuestionOrder = sessionStorage.getItem("lastQuestion");
     return storedQuestionOrder ? JSON.parse(storedQuestionOrder) + 1 : 1;
   });
@@ -17,11 +17,12 @@ const Chat = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const { axiosWithToken } = useAxios();
   const user = getSessionUserData();
-  const messagesEndRef = useRef(null)
+  const messagesEndRef = useRef(null);
   const navigate = useNavigate();
-  
+  const timerRef = useRef(null);
+
   const getQuestions = async () => {
-    const { data } = await axiosWithToken("questions");// for get all questions
+    const { data } = await axiosWithToken("questions"); // for get all questions
     setQuestions(data.data);
     // console.log(data.data);
   };
@@ -34,7 +35,7 @@ const Chat = () => {
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
-    e?.preventDefault(); 
+    e?.preventDefault();
 
     setCurrentQuestionOrder((prev) => prev + 1);
 
@@ -46,11 +47,12 @@ const Chat = () => {
     try {
       let response;
       if (chatId) {
-        
         response = await axiosWithToken.put("chats", {
           chatId,
           userId: user?.data?.user?._id,
-          questionAnswer: [{ question: currentQuestion[0].text, answer: answer }],
+          questionAnswer: [
+            { question: currentQuestion[0].text, answer: answer },
+          ],
         });
       } else {
         // If no chatId, create a new chat
@@ -60,9 +62,12 @@ const Chat = () => {
       }
 
       setChatHistory(response?.data?.data?.questionAnswer);
-      sessionStorage.setItem("lastQuestion", JSON.stringify(currentQuestionOrder));
+      sessionStorage.setItem(
+        "lastQuestion",
+        JSON.stringify(currentQuestionOrder)
+      );
 
-      // If this was the last question, navigate to home 
+      // If this was the last question, navigate to home
       if (currentQuestionOrder + 1 > questions.length) {
         sessionStorage.removeItem("chatId");
         sessionStorage.removeItem("lastQuestion");
@@ -85,15 +90,13 @@ const Chat = () => {
   };
 
   // Scroll to the bottom whenever chatHistory updates
-  useEffect (() => {
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView();
-   },[chatHistory]);
-  
+  }, [chatHistory]);
 
   useEffect(() => {
     getQuestions();
     oldQuestion();
-    
   }, []);
 
   // Filter out the current question based on order
@@ -102,16 +105,18 @@ const Chat = () => {
   );
 
   let chatId = JSON.parse(sessionStorage.getItem("chatId")) || "";
-  
+
   // console.log(chatHistory);
- 
+
   const handleKeyPress = (e) => {
-    if (e.key === "Enter" && answer.trim() !== "") {
+    if (e.key === "Enter") {
       e.preventDefault(); // Prevent form from refreshing
-      handleSubmit(); 
+      if (answer.trim() !== "") {
+        handleSubmit();
+      }
     }
   };
-  
+
   // console.log(user);
   return (
     <section
@@ -154,7 +159,11 @@ const Chat = () => {
                     </Col>
                     <Col className="text-end">
                       <p className="answer">
-                        <strong>{user?.data?.user?.username || user?.data?.data?.username}:</strong>{" "}
+                        <strong>
+                          {user?.data?.user?.username ||
+                            user?.data?.data?.username}
+                          :
+                        </strong>{" "}
                         {chat.answer}
                       </p>
                     </Col>
@@ -179,19 +188,18 @@ const Chat = () => {
           {currentQuestionOrder <= questions.length && (
             <Row className="justify-content-center mt-3">
               <Col md={8} lg={6}>
-                <Form className="d-flex justify-content-between align-items-center input-button" >
+                <Form className="d-flex justify-content-between align-items-center input-button">
                   <Form.Group controlId="userAnswer">
                     <Form.Control
-                    style={{
-                      width:"320px"
-                    }}
+                      style={{
+                        width: "320px",
+                      }}
                       type="text"
                       value={answer}
                       onChange={(e) => setAnswer(e.target.value)}
                       placeholder="Type your answer here..."
                       autoFocus
                       onKeyDown={handleKeyPress}
-                      
                     />
                   </Form.Group>
                   <Button
@@ -208,7 +216,6 @@ const Chat = () => {
           )}
         </Container>
       </main>
-      
     </section>
   );
 };
