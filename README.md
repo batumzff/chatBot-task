@@ -20,5 +20,3 @@ This template provides a minimal setup to get a ChatBot running with React and V
 - [Express.js](https://expressjs.com/) for building the RESTful API.
 - [MongoDB](https://www.mongodb.com/) for storing user and chat data.
 - [Mongoose](https://mongoosejs.com/) for interacting with MongoDB using a schema-based approach.
-
-
